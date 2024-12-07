@@ -1,0 +1,16 @@
+{
+  "github_token": "your_github_pat_here",
+  "owner": "owner_username",
+  "repo_name": "repository_name",
+  "llm_endpoint": "https://api.openai.com/v1/engines/text-davinci-003/completions",
+  "llm_model": "text-davinci-003",
+  "first_pass_mode": false,
+  "last_run_timestamp": "2024-12-05T23:44:00Z",
+  "retrieval_threshold": 0.7,
+  "max_tokens": 500,
+  "chunk_size": 512,
+  "max_retries": 3,
+  "retry_delay_seconds": 5,
+  "test_mode": true,
+  "test_output_file": "test_output.log"
+}
