@@ -1,0 +1,21 @@
+name: Deprecate v4 Issues
+steps:
+  - name: Identify v4 Issues
+    type: llm
+    prompt: |
+      Analyze the following GitHub issue:
+      Title: {title}
+      Body: {body}
+      Determine if this issue is related to v4 or v1. Respond with a JSON object containing only a "is_v4_or_v1" key with a value of "yes" or "no".
+    output_schema: |
+      {
+        "is_v4_or_v1": "yes|no"
+      }
+    actions:
+      - name: Tag and Close
+        condition: "is_v4_or_v1 == 'yes'"
+        steps:
+          - type: comment
+            content: "This issue is related to v4 or v1. Please consider deprecating or closing it. /v1 /close"
+          - type: close
+        next_action: "break"

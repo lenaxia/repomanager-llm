@@ -33,6 +33,10 @@ async def main_orchestrator(first_pass_mode=False):
         issues = get_issues(since=last_run_timestamp)
     
     workflows = load_yaml_workflow('workflows')
+    deprecate_v4_workflow = load_yaml_workflow('workflows/deprecate_v4_issues.yaml')
+    move_setup_workflow = load_yaml_workflow('workflows/move_setup_issues_to_discussion.yaml')
+    workflows.extend(deprecate_v4_workflow)
+    workflows.extend(move_setup_workflow)
     
     # Ensure embeddings are cached for all URLs specified in the workflows
     all_urls = set()

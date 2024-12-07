@@ -1,0 +1,22 @@
+name: Move Setup Issues to Discussion
+steps:
+  - name: Identify Setup Issues
+    type: llm
+    prompt: |
+      Analyze the following GitHub issue:
+      Title: {title}
+      Body: {body}
+      Determine if this issue is related to setup or configuration. Respond with a JSON object containing only a "is_setup_or_config" key with a value of "yes" or "no".
+    output_schema: |
+      {
+        "is_setup_or_config": "yes|no"
+      }
+    actions:
+      - name: Move to Discussion and Close
+        condition: "is_setup_or_config == 'yes'"
+        steps:
+          - type: comment
+            content: "This issue is related to setup or configuration. Please move it to discussions. /discussion /close"
+          - type: convert_to_discussion
+          - type: close
+        next_action: "break"
