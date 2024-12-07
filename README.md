@@ -137,22 +137,79 @@ steps:
         next_action: "break"
 ```
 
+#### Workflow YAML Schema
+
+The workflow YAML files follow a specific schema to define the steps and actions to be executed. Here is the full schema definition:
+
+```yaml
+name: string  # Name of the workflow
+steps:
+  - name: string  # Name of the step
+    type: string  # Type of the step (e.g., 'llm', 'retrieve_context', 'generate_response', 'comment', 'label', 'close', 'convert_to_discussion')
+    prompt: string  # Prompt for the LLM request (only if type is 'llm')
+    output_schema: string  # JSON schema for validating the LLM response (only if type is 'llm')
+    urls: list  # List of URLs to fetch context from (only if type is 'retrieve_context')
+    actions:
+      - name: string  # Name of the action
+        condition: string  # Condition to check before executing the action
+        steps:
+          - type: string  # Type of the sub-step (e.g., 'comment', 'label', 'close', 'convert_to_discussion')
+            content: string  # Content for the comment (only if type is 'comment')
+            labels: list  # List of labels to add (only if type is 'label')
+        next_action: string  # Name of the next action to execute (optional, default is 'break')
+```
+
 ### Configuration
 
-- **`github_token`**: Your GitHub Personal Access Token.
-- **`owner`**: The GitHub username or organization that owns the repository.
-- **`repo_name`**: The name of the GitHub repository.
-- **`llm_endpoint`**: The endpoint for the LLM API.
-- **`llm_model`**: The model to use for the LLM API.
-- **`first_pass_mode`**: Set to `true` to process all open issues.
-- **`last_run_timestamp`**: The timestamp of the last run.
-- **`retrieval_threshold`**: The similarity threshold for retrieving context.
-- **`max_tokens`**: The maximum number of tokens to use in LLM requests.
-- **`chunk_size`**: The size of text chunks for embedding.
-- **`max_retries`**: The maximum number of retries for LLM requests.
-- **`retry_delay_seconds`**: The delay between retries for LLM requests.
-- **`test_mode`**: Set to `true` to run in test mode.
-- **`test_output_file`**: The file to log test actions.
+The `config.json` file contains various configuration parameters that control the behavior of the tool. Here is a detailed explanation of each parameter:
+
+- **`github_token`**: Your GitHub Personal Access Token. This token is used to authenticate requests to the GitHub API.
+- **`owner`**: The GitHub username or organization that owns the repository. This is used to identify the repository.
+- **`repo_name`**: The name of the GitHub repository. This is used to identify the repository.
+- **`llm_endpoint`**: The endpoint for the LLM API. This is the URL where the LLM requests are sent.
+- **`llm_model`**: The model to use for the LLM API. This specifies the model that the LLM should use for generating responses.
+- **`first_pass_mode`**: A boolean flag to indicate whether the tool should process all open issues. Set to `true` to process all open issues, otherwise `false`.
+- **`last_run_timestamp`**: The timestamp of the last run. This is used to fetch issues that have been updated since the last run.
+- **`retrieval_threshold`**: The similarity threshold for retrieving context. This is used to determine if a chunk of text is relevant based on its similarity score.
+- **`max_tokens`**: The maximum number of tokens to use in LLM requests. This limits the length of the input and output text for the LLM.
+- **`chunk_size`**: The size of text chunks for embedding. This determines how large each chunk of text will be when creating embeddings.
+- **`max_retries`**: The maximum number of retries for LLM requests. This specifies how many times the tool should retry an LLM request if it fails.
+- **`retry_delay_seconds`**: The delay between retries for LLM requests. This specifies the time to wait between retries.
+- **`test_mode`**: A boolean flag to indicate whether the tool should run in test mode. Set to `true` to log actions without performing them on GitHub.
+- **`test_output_file`**: The file to log test actions. This specifies the file where test actions will be logged.
+
+### Directory Structure
+
+```
+repomanager-llm/
+├── .gitignore
+├── README.md
+├── actions.py
+├── config.json
+├── embeddings_cache.pkl
+├── llm.py
+├── main.py
+├── requirements.txt
+├── utils.py
+└── workflows/
+    └── rag_based_workflow.yaml
+```
+
+## Contributing
+
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Make your changes and commit them.
+4. Push your changes to your fork.
+5. Open a pull request to the main repository.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+## Contact
+
+For any questions or issues, please open an issue in the repository or contact the maintainer at [your-email@example.com](mailto:your-email@example.com).
 
 ## Directory Structure
 
