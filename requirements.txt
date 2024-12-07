@@ -1,0 +1,5 @@
+aiohttp==3.8.4
+PyYAML==6.0
+sentence-transformers==2.2.2
+github3.py==1.5.0
+tenacity==8.2.2
