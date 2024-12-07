@@ -212,73 +212,6 @@ The following actions and step types can be used in the workflows:
 - **`generate_response`**: Generates a response to the issue using the LLM.
   - **`prompt`**: The prompt to generate the response. Supports template variables.
 
-### Example Workflow
-
-Here is an example of a workflow that uses the available actions and step types:
-
-```yaml
-name: RAG-Based Workflow
-steps:
-  - name: Categorize Issue
-    type: llm
-    prompt: |
-      Analyze the following GitHub issue:
-      Title: {title}
-      Body: {body}
-      Categorize this issue as 'bug', 'triage', 'feature request', or 'no'. Respond with a JSON object containing only a "category" key with a value from the above list.
-    output_schema: |
-      {
-        "category": "bug|triage|feature request|no"
-      }
-    actions:
-      - name: Tag and Close
-        condition: "category != 'no'"
-        steps:
-          - type: label
-            labels: ["{category}"]
-        next_action: "Check for Response"
-      - name: No Category
-        condition: "category == 'no'"
-        steps:
-          - type: comment
-            content: "This issue does not fall into a defined category. Please provide more details."
-        next_action: "break"
-
-  - name: Check for Response
-    type: llm
-    prompt: |
-      Analyze the following GitHub issue:
-      Title: {title}
-      Body: {body}
-      Does this issue warrant a response based on the following criteria: [list of criteria]. Respond with a JSON object containing only a "response_warranted" key with a value of "yes" or "no".
-    output_schema: |
-      {
-        "response_warranted": "yes|no"
-      }
-    actions:
-      - name: Generate Response
-        condition: "response_warranted == 'yes'"
-        steps:
-          - type: retrieve_context
-            urls: ["https://example.com/doc1.pdf", "https://example.com/doc2.pdf"]
-          - type: generate_response
-            prompt: |
-              Generate a response to the following GitHub issue:
-              Title: {title}
-              Body: {body}
-              Category: {category}
-              Context: {context}
-          - type: comment
-            content: "{response}"
-        next_action: "break"
-      - name: No Response
-        condition: "response_warranted == 'no'"
-        steps:
-          - type: comment
-            content: "This issue does not warrant a response based on the defined criteria."
-        next_action: "break"
-```
-
 ### Directory Structure
 
 ```
@@ -296,39 +229,6 @@ repomanager-llm/
     └── rag_based_workflow.yaml
     └── deprecate_v4_issues.yaml
     └── move_setup_issues_to_discussion.yaml
-```
-
-## Contributing
-
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix.
-3. Make your changes and commit them.
-4. Push your changes to your fork.
-5. Open a pull request to the main repository.
-
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
-## Contact
-
-For any questions or issues, please open an issue in the repository or contact the maintainer at [your-email@example.com](mailto:your-email@example.com).
-
-### Directory Structure
-
-```
-repomanager-llm/
-├── .gitignore
-├── README.md
-├── actions.py
-├── config.json
-├── embeddings_cache.pkl
-├── llm.py
-├── main.py
-├── requirements.txt
-├── utils.py
-└── workflows/
-    └── rag_based_workflow.yaml
 ```
 
 ## Contributing
