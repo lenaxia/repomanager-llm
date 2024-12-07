@@ -211,35 +211,3 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 For any questions or issues, please open an issue in the repository or contact the maintainer at [your-email@example.com](mailto:your-email@example.com).
 
-## Directory Structure
-
-```
-repomanager-llm/
-├── .gitignore
-├── README.md
-├── actions.py
-├── config.json
-├── embeddings_cache.pkl
-├── llm.py
-├── main.py
-├── requirements.txt
-├── utils.py
-└── workflows/
-    └── rag_based_workflow.yaml
-```
-
-## Contributing
-
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix.
-3. Make your changes and commit them.
-4. Push your changes to your fork.
-5. Open a pull request to the main repository.
-
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
-## Contact
-
-For any questions or issues, please open an issue in the repository or contact the maintainer at [your-email@example.com](mailto:your-email@example.com).
