@@ -178,6 +178,142 @@ The `config.json` file contains various configuration parameters that control th
 - **`test_mode`**: A boolean flag to indicate whether the tool should run in test mode. Set to `true` to log actions without performing them on GitHub.
 - **`test_output_file`**: The file to log test actions. This specifies the file where test actions will be logged.
 
+### Data Object
+
+The data object passed to the workflows contains the following fields:
+
+- **`title`**: The title of the GitHub issue.
+- **`body`**: The body of the GitHub issue.
+- **`comments`**: A list of comments on the issue, each with `id`, `body`, `created_at`, `updated_at`, and `user`.
+- **`created_date`**: The ISO 8601 formatted creation date of the issue.
+- **`last_modified_date`**: The ISO 8601 formatted last modified date of the issue.
+- **`is_pull_request`**: A boolean indicating whether the issue is a pull request.
+- **`labels`**: A list of labels associated with the issue.
+- **`age`**: The age of the issue in days.
+- **`staleness`**: The staleness of the issue in days.
+- **`category`**: The category of the issue as determined by the LLM (if applicable).
+- **`context`**: The relevant context retrieved from external documents (if applicable).
+
+### Actions and Step Types
+
+The following actions and step types can be used in the workflows:
+
+- **`comment`**: Adds a comment to the issue.
+  - **`content`**: The content of the comment. Supports template variables.
+- **`label`**: Adds labels to the issue.
+  - **`labels`**: A list of labels to add. Supports template variables.
+- **`close`**: Closes the issue.
+- **`convert_to_discussion`**: Converts the issue to a discussion.
+- **`llm`**: Sends a request to the LLM API.
+  - **`prompt`**: The prompt to send to the LLM. Supports template variables.
+  - **`output_schema`**: The JSON schema to validate the LLM response.
+- **`retrieve_context`**: Retrieves relevant context from external documents.
+  - **`urls`**: A list of URLs to fetch context from. Supports template variables.
+- **`generate_response`**: Generates a response to the issue using the LLM.
+  - **`prompt`**: The prompt to generate the response. Supports template variables.
+
+### Example Workflow
+
+Here is an example of a workflow that uses the available actions and step types:
+
+```yaml
+name: RAG-Based Workflow
+steps:
+  - name: Categorize Issue
+    type: llm
+    prompt: |
+      Analyze the following GitHub issue:
+      Title: {title}
+      Body: {body}
+      Categorize this issue as 'bug', 'triage', 'feature request', or 'no'. Respond with a JSON object containing only a "category" key with a value from the above list.
+    output_schema: |
+      {
+        "category": "bug|triage|feature request|no"
+      }
+    actions:
+      - name: Tag and Close
+        condition: "category != 'no'"
+        steps:
+          - type: label
+            labels: ["{category}"]
+        next_action: "Check for Response"
+      - name: No Category
+        condition: "category == 'no'"
+        steps:
+          - type: comment
+            content: "This issue does not fall into a defined category. Please provide more details."
+        next_action: "break"
+
+  - name: Check for Response
+    type: llm
+    prompt: |
+      Analyze the following GitHub issue:
+      Title: {title}
+      Body: {body}
+      Does this issue warrant a response based on the following criteria: [list of criteria]. Respond with a JSON object containing only a "response_warranted" key with a value of "yes" or "no".
+    output_schema: |
+      {
+        "response_warranted": "yes|no"
+      }
+    actions:
+      - name: Generate Response
+        condition: "response_warranted == 'yes'"
+        steps:
+          - type: retrieve_context
+            urls: ["https://example.com/doc1.pdf", "https://example.com/doc2.pdf"]
+          - type: generate_response
+            prompt: |
+              Generate a response to the following GitHub issue:
+              Title: {title}
+              Body: {body}
+              Category: {category}
+              Context: {context}
+          - type: comment
+            content: "{response}"
+        next_action: "break"
+      - name: No Response
+        condition: "response_warranted == 'no'"
+        steps:
+          - type: comment
+            content: "This issue does not warrant a response based on the defined criteria."
+        next_action: "break"
+```
+
+### Directory Structure
+
+```
+repomanager-llm/
+├── .gitignore
+├── README.md
+├── actions.py
+├── config.json
+├── embeddings_cache.pkl
+├── llm.py
+├── main.py
+├── requirements.txt
+├── utils.py
+└── workflows/
+    └── rag_based_workflow.yaml
+    └── deprecate_v4_issues.yaml
+    └── move_setup_issues_to_discussion.yaml
+```
+
+## Contributing
+
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Make your changes and commit them.
+4. Push your changes to your fork.
+5. Open a pull request to the main repository.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+## Contact
+
+For any questions or issues, please open an issue in the repository or contact the maintainer at [your-email@example.com](mailto:your-email@example.com).
+
 ### Directory Structure
 
 ```
